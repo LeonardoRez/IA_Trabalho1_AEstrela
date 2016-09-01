@@ -2,6 +2,7 @@ package ia_t1_tspcomaestrela;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.PriorityQueue;
 
 class Edge implements Comparable {
 
@@ -22,6 +23,42 @@ class Edge implements Comparable {
 
 }
 
+class UnionFind {
+
+    private int[] p, rank;
+
+    public UnionFind(int N) {
+        p = new int[N];
+        rank = new int[N];
+        for (int i = 0; i < N; i++) {
+            p[i] = i;
+            rank[i] = 0;
+        }
+    }
+
+    public int findSet(int i) {
+        return (p[i] == i) ? i : (p[i] = findSet(p[i]));
+    }
+
+    public boolean isSameSet(int i, int j) {
+        return findSet(i) == findSet(j);
+    }
+
+    public void unionSet(int i, int j) {
+        if (!isSameSet(i, j)) {
+            int x = findSet(i), y = findSet(j);
+            if (rank[x] > rank[y]) {
+                p[y] = x;
+            } else {
+                p[x] = y;
+                if (rank[x] == rank[y]) {
+                    rank[y]++;
+                }
+            }
+        }
+    }
+}
+
 public class AStar {
 
     private ArrayList<String> V;
@@ -31,21 +68,52 @@ public class AStar {
         V = new ArrayList<>();
         E = new ArrayList<>();
     }
+    public void calcAStar() {
+        
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
+        
+//        queue.add()
+    }
+
+    public void calcCaminho(String cityInicial) {
+        ArrayList<String> visitados = new ArrayList<>();
+        ArrayList<String> naoVisit = new ArrayList<>();
+        
+        ArrayList<String> result = new ArrayList<>();
+        result.add(cityInicial);
+        
+        
+        for (String v : V) {
+            if(!strIgual(v, cityInicial))
+                naoVisit.add(v);
+        }
+        
+        String cAtual = cityInicial;
+        while(!naoVisit.isEmpty()){
+           int[] pesos = new int[naoVisit.size()];
+           for(int i=0;i<naoVisit.size();i++){
+               
+           }
+        }
+
+    }
+    
+
 
     public int MST() {
         Collections.sort(E);
         ArrayList<Edge> S = new ArrayList<>();
+        UnionFind UF = new UnionFind(V.size());
+        int mst_cost = 0;
+
         for (Edge e : E) {
-            if (!bfs(e.v1, e.v2)) {
+            if (!UF.isSameSet(getListaIndex(e.v1), getListaIndex(e.v2))) {
+                mst_cost += e.cost;
+                UF.unionSet(getListaIndex(e.v1), getListaIndex(e.v2));
                 S.add(e);
             }
         }
-        int total = 0;
-        for (Edge e : S) {
-            total += e.cost;
-        }
-        return total;
-
+        return mst_cost;
     }
 
     private boolean bfs(String v, String dest) throws IllegalAccessError {
@@ -115,4 +183,22 @@ public class AStar {
         }
         return -1;
     }
+
+    private int getListaIndex(String v,ArrayList<String> L) {
+        for (int i = 0; i < L.size(); i++) {
+            if (strIgual(v, L.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Integer> p;
+        p = new ArrayList<Integer>();
+        for (int i : p) {
+            System.out.println("" + i);
+        }
+    }
+
 }
