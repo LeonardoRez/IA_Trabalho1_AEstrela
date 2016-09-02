@@ -6,11 +6,11 @@ import java.util.PriorityQueue;
 
 class Edge implements Comparable {
 
-    public String v1;
-    public String v2;
+    public int v1;
+    public int v2;
     public int cost;
 
-    public Edge(String v1, String v2, int cost) {
+    public Edge(int v1, int v2, int cost) {
         this.v1 = v1;
         this.v2 = v2;
         this.cost = cost;
@@ -19,6 +19,29 @@ class Edge implements Comparable {
     @Override
     public int compareTo(Object t) {
         return this.cost - ((Edge) t).cost;
+    }
+
+}
+
+class No implements Comparable {
+
+    public int ID;
+    public int cost;
+    public int pai;
+
+    public No(int ID, int pai) {
+        this.ID = ID;
+        this.pai = pai;
+        cost = 0;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
+    @Override
+    public int compareTo(Object t) {
+        return this.cost - ((No) t).cost;
     }
 
 }
@@ -68,37 +91,36 @@ public class AStar {
         V = new ArrayList<>();
         E = new ArrayList<>();
     }
-    public void calcAStar() {
-        
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
-        
-//        queue.add()
-    }
 
-    public void calcCaminho(String cityInicial) {
-        ArrayList<String> visitados = new ArrayList<>();
-        ArrayList<String> naoVisit = new ArrayList<>();
-        
-        ArrayList<String> result = new ArrayList<>();
-        result.add(cityInicial);
-        
-        
-        for (String v : V) {
-            if(!strIgual(v, cityInicial))
-                naoVisit.add(v);
+    public void calcAStar(String inicio) {
+
+        PriorityQueue<No> open = new PriorityQueue<>();
+        open.add(new No(getListaIndex(inicio), 0));
+        ArrayList<No> closed = new ArrayList<>();
+
+        boolean[] naoEXP = new boolean[V.size()];
+        for (int i = 0; i < V.size(); i++) {
+            naoEXP[i] = true;
         }
-        
-        String cAtual = cityInicial;
-        while(!naoVisit.isEmpty()){
-           int[] pesos = new int[naoVisit.size()];
-           for(int i=0;i<naoVisit.size();i++){
-               
-           }
+        naoEXP[getListaIndex(inicio)] = false;
+
+        while (!open.isEmpty()) {
+            No q = open.poll();
+            ArrayList<No> sucessores = new ArrayList<>();
+            for (Edge e : E) {
+                if (q.ID == e.v1) {
+                    sucessores.add(new No(e.v2, q.ID));
+                }
+                if (q.ID == e.v2) {
+                    sucessores.add(new No(e.v1, q.ID));
+                }
+            }
+            for (No n : sucessores) {
+//                n.cost = 
+            }
         }
 
     }
-    
-
 
     public int MST() {
         Collections.sort(E);
@@ -107,55 +129,13 @@ public class AStar {
         int mst_cost = 0;
 
         for (Edge e : E) {
-            if (!UF.isSameSet(getListaIndex(e.v1), getListaIndex(e.v2))) {
+            if (!UF.isSameSet(e.v1, e.v2)) {
                 mst_cost += e.cost;
-                UF.unionSet(getListaIndex(e.v1), getListaIndex(e.v2));
+                UF.unionSet((e.v1), (e.v2));
                 S.add(e);
             }
         }
         return mst_cost;
-    }
-
-    private boolean bfs(String v, String dest) throws IllegalAccessError {
-        ArrayList<Edge> L = new ArrayList<>();
-        ArrayList<Edge> T = new ArrayList<>();
-        int[] explorados = new int[E.size()];
-        for (int i = 0; i < explorados.length; i++) {
-            explorados[i] = 0;
-        }
-        markExplorado(v, explorados);
-
-        searchBFS(v, L);
-        while (!L.isEmpty()) {
-            Edge aux = L.get(0);
-            L.remove(0);
-            if (explorados[getListaIndex(aux.v1)] == 0) {
-                T.add(aux);
-                searchBFS(aux.v1, L);
-                explorados[getListaIndex(aux.v1)] = 1;
-            }
-            if (explorados[getListaIndex(aux.v2)] == 0) {
-                T.add(aux);
-                searchBFS(aux.v2, L);
-                explorados[getListaIndex(aux.v2)] = 1;
-            }
-
-        }
-        for (Edge e : T) {
-            if (strIgual(e.v1, dest) || strIgual(e.v2, dest)) {
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    private void searchBFS(String v, ArrayList<Edge> L) {
-        for (Edge x : E) {
-            if (strIgual(v, x.v1) || strIgual(v, x.v2)) {
-                L.add(x);
-            }
-        }
     }
 
     private boolean strIgual(String s1, String s2) {
@@ -163,15 +143,6 @@ public class AStar {
             return true;
         } else {
             return false;
-        }
-    }
-
-    private void markExplorado(String v, int[] explorados) {
-        int temp = getListaIndex(v);
-        if (temp >= 0) {
-            explorados[temp] = 1;
-        } else {
-            throw new IllegalAccessError("O vértice não foi encontrado!");
         }
     }
 
@@ -184,7 +155,7 @@ public class AStar {
         return -1;
     }
 
-    private int getListaIndex(String v,ArrayList<String> L) {
+    private int getListaIndex(String v, ArrayList<String> L) {
         for (int i = 0; i < L.size(); i++) {
             if (strIgual(v, L.get(i))) {
                 return i;
